@@ -4,8 +4,6 @@ const app = express();
 const port = 3000;
 
 app.get("/goals", (req, res) => {
-    console.log("helloooo");
-    
     res.json([
         { id: "goal_id", name: "Goal Name" },
     ]);

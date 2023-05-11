@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/typescript/bin/tsc && node --es-module-specifier-resolution=node --no-warnings=ExperimentalWarning dist/server.js"
+    "start": "./node_modules/typescript/bin/tsc && node --es-module-specifier-resolution=node --no-warnings=ExperimentalWarning dist/server.js",
+    "docker": "docker-compose --env-file .env.dev up --build"
   },
   "repository": {
     "type": "git",

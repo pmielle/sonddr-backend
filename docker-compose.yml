@@ -1,6 +1,17 @@
 version: '3.9'
 services:
+
+  auth: 
+    build: ./containers/auth/
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+
   api:
-    build: .
+    build: ./
     ports:
       - "3000:3000"
+    depends_on:
+      - auth

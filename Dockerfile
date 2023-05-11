@@ -1,5 +1,5 @@
 FROM node:18
-WORKDIR /srv
+WORKDIR /srv/
 COPY package.json ./
 RUN npm install
 COPY ./ ./
