@@ -4,8 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "./node_modules/typescript/bin/tsc && node --es-module-specifier-resolution=node --no-warnings=ExperimentalWarning dist/server.js",
-    "docker": "docker-compose --env-file .env.dev up --build"
+    "start": "./node_modules/typescript/bin/tsc && node --es-module-specifier-resolution=node --no-warnings=ExperimentalWarning dist/server.js"
   },
   "repository": {
     "type": "git",
