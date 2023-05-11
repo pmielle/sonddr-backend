@@ -1,10 +1,21 @@
 import express from "express";
 import { getGoals } from "./database";
+import { getAuthClient, getAuthMiddleware, getAuthProtection } from "./authentication";
+import { MemoryStore } from "express-session";
+import { makeSession } from "./session";
 
 const app = express();
 const port = 3000;
 
-app.get("/goals", async (req, res) => {
+const store = new MemoryStore();
+
+const session = makeSession(store);
+app.use(session);  // must be done before using auth middleware
+
+const authClient = getAuthClient(store);
+app.use(getAuthMiddleware(authClient));
+
+app.get("/goals", getAuthProtection(authClient), async (req, res) => {
     let goals = await getGoals();
     res.json(goals);
 });
