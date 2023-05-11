@@ -1,12 +1,12 @@
-import express from "express"; 
+import express from "express";
+import { getGoals } from "./database";
 
 const app = express();
 const port = 3000;
 
-app.get("/goals", (req, res) => {
-    res.json([
-        { id: "goal_id", name: "Goal Name" },
-    ]);
+app.get("/goals", async (req, res) => {
+    let goals = await getGoals();
+    res.json(goals);
 });
 
 app.listen(port, () => {
