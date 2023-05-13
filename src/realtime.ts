@@ -1,10 +1,10 @@
 import http from "http";
 import internal from "stream";
 import { URL } from "url";
-import ws from "ws";
+import { WebSocketServer } from "ws";
 import { getNotifications } from "./database";
 
-const wsServer = new ws.WebSocketServer({ noServer: true });
+const wsServer = new WebSocketServer({ noServer: true });
 
 export function addRealTimeRoutes(httpServer: http.Server) {
     httpServer.on("upgrade", (req, socket, head) => {
