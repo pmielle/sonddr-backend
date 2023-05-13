@@ -4,25 +4,33 @@ import { getAuthClient, getAuthMiddleware, getAuthProtection } from "./authentic
 import { MemoryStore } from "express-session";
 import { makeSession } from "./session";
 import cors from "cors";
+import dotenv from "dotenv";
+import http from "http";
+import ws from "ws";
+import { addRealTimeRoutes } from "./realtime";
+
+dotenv.config({path: ".env.dev"});
 
 const app = express();
-const port = 3000;
+const httpServer = http.createServer(app);
 
 const store = new MemoryStore();
-
 const session = makeSession(store);
 app.use(session);  // must be done before using auth middleware
 
+app.use(cors({origin: "http://localhost:4200"}));
+
 const authClient = getAuthClient(store);
 app.use(getAuthMiddleware(authClient));
-
-app.use(cors({origin: "http://localhost:4200"}));
 
 app.get("/goals", getAuthProtection(authClient), async (req, res) => {
     let goals = await getGoals();
     res.json(goals);
 });
 
+addRealTimeRoutes(httpServer);
+
+const port = process.env["EXPRESS_PORT"];
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });

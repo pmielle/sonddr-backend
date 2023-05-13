@@ -1,5 +1,4 @@
 import session, { MemoryStore } from "express-session";
-import dotenv from "dotenv";
 
 export function getMemoryStore(): MemoryStore {
     return new session.MemoryStore();
