@@ -37,6 +37,7 @@ function streamCollection<T>(path: string): Observable<T[]> {
     const collection$ = from(getCollection<T>(path));  // to avoid promise<observable>
     return collection$.pipe(switchMap((value) => {
         return new Observable<T[]>((subscriber) => {
+            subscriber.next(value);
             changeStream.on("change", (change) => {
                 handleChange(change, value);  // mutates value
                 subscriber.next(value);
