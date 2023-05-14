@@ -12,7 +12,6 @@ import { addRealTimeRoutes } from "./realtime";
 dotenv.config({path: ".env.dev"});
 
 const app = express();
-const httpServer = http.createServer(app);
 
 const store = new MemoryStore();
 const session = makeSession(store);
@@ -28,9 +27,10 @@ app.get("/goals", getAuthProtection(authClient), async (req, res) => {
     res.json(goals);
 });
 
+const httpServer = http.createServer(app);
 addRealTimeRoutes(httpServer);
 
 const port = process.env["EXPRESS_PORT"];
-app.listen(port, () => {
+httpServer.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });

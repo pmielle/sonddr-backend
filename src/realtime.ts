@@ -4,14 +4,15 @@ import { URL } from "url";
 import { WebSocketServer } from "ws";
 import { getNotifications } from "./database";
 
-const wsServer = new WebSocketServer({ noServer: true });
+const notificationWss = new WebSocketServer({ noServer: true });
 
 export function addRealTimeRoutes(httpServer: http.Server) {
     httpServer.on("upgrade", (req, socket, head) => {
-        const route = getRouteFromUrl(req.url);
+        const url = getUrlFromReq(req);
+        const route = url.pathname;
         switch(route) {
             case "/notifications": {
-                onNotificationsUpgrade(req, socket, head);
+                handleUpgrade(notificationWss, req, socket, head);
                 break;
             }
             default: {
@@ -23,29 +24,32 @@ export function addRealTimeRoutes(httpServer: http.Server) {
 
 // private
 // --------------------------------------------
-function onNotificationsUpgrade(req: http.IncomingMessage, socket: internal.Duplex, head: Buffer) {
-    const idKey = "userId";
-    const userId = getQueryParamFromUrl(req.url, idKey);
-    if (!userId) {
-        socket.destroy(new Error(`${idKey} not found in query params`));
-    }
-    wsServer.handleUpgrade(req, socket, head, (socket) => {
-        getNotifications(userId).subscribe({
-            next: (notifications) => socket.send(notifications),
-            error: (error) => socket.close(1001, error),
-            complete: () => socket.close(1000),
-        });
+function handleUpgrade(wss: WebSocketServer, req: http.IncomingMessage, socket: internal.Duplex, head: Buffer) {
+    wss.handleUpgrade(req, socket, head, (socket) => {
+        wss.emit("connection", socket, req);
     });
 }
 
-function getRouteFromUrl(url: string): string {
-    const urlObj = new URL(url);
-    const route = urlObj.pathname;
-    return route;
-}
+notificationWss.on("connection", (socket, req) => {
+    const idKey = "userId";
+    const url = getUrlFromReq(req);
+    const userId = url.searchParams.get(idKey);
+    if (!userId) {
+        socket.close(1001, `${idKey} not found in query params`);
+    }
+    getNotifications(userId).subscribe({
+        next: (notifications) => {
+            socket.send(JSON.stringify(notifications));
+        },
+        error: (error) => {
+            socket.close(1001, JSON.stringify(error));
+        },
+        complete: () => {
+            socket.close(1000);
+        },
+    });
+});
 
-function getQueryParamFromUrl(url: string, key: string): string {
-    const urlObj = new URL(url);
-    const value = urlObj.searchParams.get(key);
-    return value;
+function getUrlFromReq(req: http.IncomingMessage): URL {
+    return new URL(req.url, `http://${req.headers.host}`);
 }
