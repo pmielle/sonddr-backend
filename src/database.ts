@@ -20,7 +20,7 @@ export async function getGoals(): Promise<DbGoal[]> {
 }
 
 export function getNotifications(userId: string): Observable<DbNotification[]> {
-    return streamCollection<DbNotification>(`${userId}/notifications`);
+    return streamCollection<DbNotification>("notifications", [{ $match: { "fullDocument.id": userId } }]);
 }
 
 // private
@@ -30,8 +30,7 @@ async function getCollection<T>(path: string): Promise<T[]> {
     return data as T[];
 }
 
-function streamCollection<T>(path: string): Observable<T[]> {
-    const pipeline: Document[] = [];
+function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
     const options: ChangeStreamOptions = { fullDocument: "updateLookup" };
     const changeStream = db.collection<T>(path).watch(pipeline, options);
     const collection$ = from(getCollection<T>(path));  // to avoid promise<observable>
