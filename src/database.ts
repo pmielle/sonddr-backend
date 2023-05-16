@@ -20,7 +20,7 @@ export async function getGoals(): Promise<DbGoal[]> {
 }
 
 export function getNotifications(userId: string): Observable<DbNotification[]> {
-    return streamCollection<DbNotification>("notifications", [{ $match: { "fullDocument.id": userId } }]);
+    return streamCollection<DbNotification>("notifications");
 }
 
 // private
