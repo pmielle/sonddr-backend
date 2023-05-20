@@ -1,6 +1,6 @@
 import express from "express";
 import { getGoals } from "./database";
-import { getAuthClient, getAuthMiddleware, getAuthProtection, protectWs } from "./authentication";
+import { getAuthClient, getAuthMiddleware, getAuthProtection, getWsProtection } from "./authentication";
 import { MemoryStore } from "express-session";
 import { makeSession } from "./session";
 import cors from "cors";
@@ -22,14 +22,15 @@ app.use(cors({origin: "http://localhost:4200"}));
 
 const authClient = getAuthClient(store);
 app.use(getAuthMiddleware(authClient));
-const protectHttp = authClient.protect();
+const httpProtection = getAuthProtection(authClient);
+const wsProtection = getWsProtection(authClient);
 
-app.get("/goals", protectHttp, async (req, res) => {
+app.get("/goals", httpProtection, async (req, res) => {
     let goals = await getGoals();
     res.json(goals);
 });
 
-app.ws("/notifications", protectWs, (socket, req) => {
+app.ws("/notifications", wsProtection, (socket, req) => {
     onNotificationConnection(socket, req);
 })
 

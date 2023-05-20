@@ -32,10 +32,20 @@ export function getAuthProtection(client: Keycloak.Keycloak): RequestHandler {
     return client.protect();
 }
 
-export function protectWs(ws, request, next): WebsocketRequestHandler {
-    if (request.kauth && request.kauth.grant) {
-        return next();
+export function getWsProtection(client: Keycloak.Keycloak): WebsocketRequestHandler {
+    return async (ws, request, next) => {
+        let token = request.query.token as string;
+        if (token && await validateToken(client, token)) {
+            return next();
+        }
+        ws.close(1001, "Access denied");
     }
-    ws.close(1001, "Access denied");
 };
+
+async function validateToken(client: Keycloak.Keycloak, token: string): Promise<boolean> {
+    let realmUrl = client.getConfig()["realmUrl"];
+    let url = `${realmUrl}/protocol/openid-connect/userinfo`;
+    let response = await fetch(url, { headers: { "Authorization": `Bearer ${token}` }});
+    return response.ok;
+}
 
