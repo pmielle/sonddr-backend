@@ -1,7 +1,7 @@
 import http from "http";
 import { WebSocket } from "ws";
 import { getUrlFromReq, streamToWebsocket } from "../realtime";
-import { getNotifications } from "../database";
+import { streamCollection } from "../database";
 
 export function onNotificationConnection(socket: WebSocket, req: http.IncomingMessage) {
     const idKey = "userId";
@@ -10,5 +10,5 @@ export function onNotificationConnection(socket: WebSocket, req: http.IncomingMe
     if (!userId) {
         socket.close(1001, `${idKey} not found in query params`);
     }
-    streamToWebsocket(getNotifications(userId), socket);
+    streamToWebsocket(streamCollection("notifications"), socket);
 }

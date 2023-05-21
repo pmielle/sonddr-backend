@@ -12,3 +12,8 @@ export interface DbDiscussion {
     _id: string,
     userIds: string[],
 }
+
+export interface DbUser {
+    _id: string,
+    name: string,
+}

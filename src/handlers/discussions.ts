@@ -1,7 +1,7 @@
 import http from "http";
 import { WebSocket } from "ws";
 import { getUrlFromReq, streamToWebsocket } from "../realtime";
-import { getDiscussions } from "../database";
+import { streamCollection } from "../database";
 
 export function onDiscussionConnection(socket: WebSocket, req: http.IncomingMessage) {
     const idKey = "userId";
@@ -10,5 +10,5 @@ export function onDiscussionConnection(socket: WebSocket, req: http.IncomingMess
     if (!userId) {
         socket.close(1001, `${idKey} not found in query params`);
     }
-    streamToWebsocket(getDiscussions(userId), socket);
+    streamToWebsocket(streamCollection("discussions"), socket);
 }

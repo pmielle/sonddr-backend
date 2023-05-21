@@ -1,6 +1,5 @@
-import { ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamInsertDocument, ChangeStreamOptions, ChangeStreamUpdateDocument, Document, MongoClient } from "mongodb";
+import { ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamInsertDocument, ChangeStreamOptions, ChangeStreamUpdateDocument, Document, MongoClient, ObjectId } from "mongodb";
 import dotenv from "dotenv";
-import { DbDiscussion, DbGoal, DbNotification } from "./types";
 import { Observable, from, switchMap } from "rxjs";
 
 dotenv.config({ path: ".env.dev" });
@@ -10,26 +9,18 @@ const uri = process.env["MONGODB_CONNECTION_STRING"];
 const client = new MongoClient(uri);
 const db = client.db();
 
-export async function getGoals(): Promise<DbGoal[]> {
-    return getCollection<DbGoal>("goals");
+export async function getDocument<T>(path: string): Promise<T> {
+    const [collectionId, documentId] = parseDocumentPath(path);
+    const data: T = await db.collection(collectionId).findOne<T>({"_id": new ObjectId(documentId)});
+    return data;
 }
 
-export function getNotifications(userId: string): Observable<DbNotification[]> {
-    return streamCollection<DbNotification>("notifications");
+export async function getCollection<T>(path: string): Promise<T[]> {
+    const data: T[] = await db.collection(path).find<T>({}).toArray();
+    return data;
 }
 
-export function getDiscussions(userId: string): Observable<DbDiscussion[]> {
-    return streamCollection<DbDiscussion>("discussions");
-}
-
-// private
-// --------------------------------------------
-async function getCollection<T>(path: string): Promise<T[]> {
-    const data = await db.collection<T>(path).find({}).toArray();
-    return data as T[];
-}
-
-function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
+export function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
     const options: ChangeStreamOptions = { fullDocument: "updateLookup" };
     const changeStream = db.collection<T>(path).watch(pipeline, options);
     const collection$ = from(getCollection<T>(path));  // to avoid promise<observable>
@@ -49,6 +40,15 @@ function streamCollection<T>(path: string, pipeline: Document[] = []): Observabl
             return () => changeStream.close()  // called when client unsubscribes
         });
     }));
+}
+
+// private
+// --------------------------------------------
+function parseDocumentPath(path: string): [string, string] {
+    const pathFragments = path.split("/");
+    if (pathFragments.length != 2) { throw new Error(`Document path ${path} does not have 2 fragments`); }
+    const [collectionId, documentId] = pathFragments;
+    return [collectionId, documentId];
 }
 
 function handleChange<T>(change: ChangeStreamDocument<T>, value: T[]) {
