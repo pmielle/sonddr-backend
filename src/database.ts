@@ -1,6 +1,6 @@
 import { ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamInsertDocument, ChangeStreamOptions, ChangeStreamUpdateDocument, Document, MongoClient } from "mongodb";
 import dotenv from "dotenv";
-import { DbGoal, DbNotification } from "./types";
+import { DbDiscussion, DbGoal, DbNotification } from "./types";
 import { Observable, from, switchMap } from "rxjs";
 
 dotenv.config({ path: ".env.dev" });
@@ -16,6 +16,10 @@ export async function getGoals(): Promise<DbGoal[]> {
 
 export function getNotifications(userId: string): Observable<DbNotification[]> {
     return streamCollection<DbNotification>("notifications");
+}
+
+export function getDiscussions(userId: string): Observable<DbDiscussion[]> {
+    return streamCollection<DbDiscussion>("discussions");
 }
 
 // private

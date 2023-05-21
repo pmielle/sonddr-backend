@@ -7,3 +7,8 @@ export interface DbNotification {
     _id: string,
     content: string,
 }
+
+export interface DbDiscussion {
+    _id: string,
+    userIds: string[],
+}

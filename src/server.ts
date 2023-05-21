@@ -6,7 +6,8 @@ import { makeSession } from "./session";
 import cors from "cors";
 import dotenv from "dotenv";
 import expressWs from "express-ws";
-import { onNotificationConnection } from "./realtime";
+import { onNotificationConnection } from "./handlers/notifications";
+import { onDiscussionConnection } from "./handlers/discussions";
 
 dotenv.config({path: ".env.dev"});
 
@@ -30,9 +31,9 @@ app.get("/goals", httpProtection, async (req, res) => {
     res.json(goals);
 });
 
-app.ws("/notifications", wsProtection, (socket, req) => {
-    onNotificationConnection(socket, req);
-})
+app.ws("/notifications", wsProtection, onNotificationConnection);
+
+app.ws("/discussions", wsProtection, onDiscussionConnection);
 
 const port = process.env["EXPRESS_PORT"];
 app.listen(port, () => {
