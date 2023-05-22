@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { MemoryStore } from "express-session";
 import { makeSession } from "./session";
-import { getAuthClient, getAuthMiddleware, getAuthProtection, getWsProtection } from "./authentication";
+import { getAuthClient, getAuthMiddleware, getAuthProtection, getFetchUserIdMiddleware, getWsProtection } from "./authentication";
 import { onNotificationConnection } from "./handlers/notifications";
 import { onDiscussionConnection } from "./handlers/discussions";
 import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
@@ -33,13 +33,14 @@ const authClient = getAuthClient(store);
 app.use(getAuthMiddleware(authClient));
 const httpProtection = getAuthProtection(authClient);
 const wsProtection = getWsProtection(authClient);
+const fetchUserId = getFetchUserIdMiddleware(authClient);
 
 // routes
 // --------------------------------------------
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);
-app.post("/users", httpProtection, onUserPost);
+app.post("/users", httpProtection, fetchUserId, onUserPost);
 // goals
 app.get("/goals", httpProtection, genericGetCollectionHandler);
 // notifications

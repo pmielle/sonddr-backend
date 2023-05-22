@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import { getCollection, getDocument } from "../database";
+import { KcUser } from "../types";
+
+export function getReqUserId(req: Request): string {
+    const kcUser: KcUser = (req as any).kcUser;
+    return kcUser.id;
+}
 
 export async function genericGetDocumentHandler(req: Request, res: Response) {
     const collectionId = getCollectionIdFromReq(req);
@@ -10,6 +16,7 @@ export async function genericGetDocumentHandler(req: Request, res: Response) {
 }
 
 export async function genericGetCollectionHandler(req: Request, res: Response) {
+    console.log((req as any).kcUser);
     const collectionId = getCollectionIdFromReq(req);
     const data = await getCollection(collectionId);
     res.json(data);

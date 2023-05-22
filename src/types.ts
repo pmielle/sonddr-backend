@@ -17,3 +17,7 @@ export interface DbUser {
     _id: string,
     name: string,
 }
+
+export interface KcUser {
+    id: string,
+}
