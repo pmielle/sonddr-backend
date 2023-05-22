@@ -15,6 +15,14 @@ export async function genericGetCollectionHandler(req: Request, res: Response) {
     res.json(data);
 }
 
+export function getFromReqBody(key: string, req: Request, required: boolean = false) {
+    const value = req.body[key];
+    if (required && value === undefined) {
+        throw new Error(`${key} is missing from request body`);
+    }
+    return value;
+}
+
 // private
 // --------------------------------------------
 function getCollectionIdFromReq(req: Request): string {

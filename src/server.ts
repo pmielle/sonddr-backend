@@ -8,6 +8,7 @@ import { getAuthClient, getAuthMiddleware, getAuthProtection, getWsProtection } 
 import { onNotificationConnection } from "./handlers/notifications";
 import { onDiscussionConnection } from "./handlers/discussions";
 import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
+import { onUserPost } from "./handlers/users";
 
 // environment
 // --------------------------------------------
@@ -17,6 +18,7 @@ dotenv.config({path: ".env.dev"});
 // --------------------------------------------
 const expressApp = express();
 const app = expressWs(expressApp).app;
+app.use(express.json());
 app.use(cors({origin: "http://localhost:4200"}));
 
 // session
@@ -34,10 +36,15 @@ const wsProtection = getWsProtection(authClient);
 
 // routes
 // --------------------------------------------
+// users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);
+app.post("/users", httpProtection, onUserPost);
+// goals
 app.get("/goals", httpProtection, genericGetCollectionHandler);
+// notifications
 app.ws("/notifications", wsProtection, onNotificationConnection);
+// discussions
 app.ws("/discussions", wsProtection, onDiscussionConnection);
 
 // start

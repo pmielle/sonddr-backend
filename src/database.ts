@@ -9,6 +9,11 @@ const uri = process.env["MONGODB_CONNECTION_STRING"];
 const client = new MongoClient(uri);
 const db = client.db();
 
+export function postDocument(path: string, payload: any) {
+    if (payload["_id"] === undefined) { throw new Error("Payload is missing an _id"); }
+    db.collection(path).insertOne(payload);
+}
+
 export async function getDocument<T>(path: string): Promise<T> {
     const [collectionId, documentId] = parseDocumentPath(path);
     const data: T = await db.collection(collectionId).findOne<T>({"_id": new ObjectId(documentId)});
