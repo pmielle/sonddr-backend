@@ -7,8 +7,7 @@ import { makeSession } from "./session";
 import { getAuthClient, getAuthMiddleware, getAuthProtection, getWsProtection } from "./authentication";
 import { onNotificationConnection } from "./handlers/notifications";
 import { onDiscussionConnection } from "./handlers/discussions";
-import { onGoalsGet } from "./handlers/goals";
-import { onUserGet, onUsersGet } from "./handlers/users";
+import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
 
 // environment
 // --------------------------------------------
@@ -35,9 +34,9 @@ const wsProtection = getWsProtection(authClient);
 
 // routes
 // --------------------------------------------
-app.get("/users/:id", httpProtection, onUserGet);
-app.get("/users", httpProtection, onUsersGet);
-app.get("/goals", httpProtection, onGoalsGet);
+app.get("/users/:id", httpProtection, genericGetDocumentHandler);
+app.get("/users", httpProtection, genericGetCollectionHandler);
+app.get("/goals", httpProtection, genericGetCollectionHandler);
 app.ws("/notifications", wsProtection, onNotificationConnection);
 app.ws("/discussions", wsProtection, onDiscussionConnection);
 
