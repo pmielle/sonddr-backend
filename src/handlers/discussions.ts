@@ -1,7 +1,26 @@
 import http from "http";
 import { WebSocket } from "ws";
 import { getUrlFromReq, streamToWebsocket } from "../realtime";
-import { streamCollection } from "../database";
+import { postDocument, streamCollection } from "../database";
+import { Request, Response } from "express";
+import { v4 as uuid } from "uuid";
+import { getFromReqBody, getReqUserId } from "./generics";
+import { DbDiscussion } from "../types";
+
+export function onDiscussionPost(req: Request, res: Response) {
+    // build 
+    const id = uuid();
+    const userIds = getFromReqBody("userIds", req, true);
+    const discussion: DbDiscussion = {_id: id, userIds: userIds};
+    // authorize
+    if (! discussion.userIds.includes(getReqUserId(req))) {
+        res.status(403).send();
+    }
+    // post
+    postDocument("discussions", discussion);
+    // respond
+    res.status(200).send();
+}
 
 export function onDiscussionConnection(socket: WebSocket, req: http.IncomingMessage) {
     const idKey = "userId";

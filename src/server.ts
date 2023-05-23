@@ -6,7 +6,7 @@ import { MemoryStore } from "express-session";
 import { makeSession } from "./session";
 import { getAuthClient, getAuthMiddleware, getAuthProtection, getFetchUserIdMiddleware, getWsProtection } from "./authentication";
 import { onNotificationConnection } from "./handlers/notifications";
-import { onDiscussionConnection } from "./handlers/discussions";
+import { onDiscussionConnection, onDiscussionPost } from "./handlers/discussions";
 import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
 import { onUserPost } from "./handlers/users";
 
@@ -46,7 +46,9 @@ app.get("/goals", httpProtection, genericGetCollectionHandler);
 // notifications
 app.ws("/notifications", wsProtection, onNotificationConnection);
 // discussions
+app.post("/discussions", httpProtection, fetchUserId, onDiscussionPost);
 app.ws("/discussions", wsProtection, onDiscussionConnection);
+
 
 // start
 // --------------------------------------------
