@@ -1,3 +1,9 @@
+export interface DbIdea {
+    _id: string,
+    title: string,
+    authorId: string,
+}
+
 export interface DbGoal {
     _id: string,
     name: string,

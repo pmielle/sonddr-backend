@@ -10,12 +10,11 @@ import { DbDiscussion } from "../types";
 export function onDiscussionPost(req: Request, res: Response) {
     // build 
     const id = uuid();
-    const userIds = getFromReqBody("userIds", req, true);
+    const userIds: string[] = getFromReqBody("userIds", req, true);
+    userIds.push(getReqUserId(req));
     const discussion: DbDiscussion = {_id: id, userIds: userIds};
     // authorize
-    if (! discussion.userIds.includes(getReqUserId(req))) {
-        res.status(403).send();
-    }
+    // ...
     // post
     postDocument("discussions", discussion);
     // respond

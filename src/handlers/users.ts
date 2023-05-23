@@ -5,14 +5,11 @@ import { postDocument } from "../database";
 
 export function onUserPost(req: Request, res: Response) {
     // build 
-    const id = getFromReqBody("_id", req, true);
+    const id = getReqUserId(req);
     const name = getFromReqBody("name", req, true);
     const user: DbUser = {_id: id, name: name};
     // authorize
-    if (user._id !== getReqUserId(req)) {
-        res.status(403).send();
-        return;
-    }
+    // ...
     // post
     postDocument("users", user);
     // respond

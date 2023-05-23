@@ -9,6 +9,7 @@ import { onNotificationConnection } from "./handlers/notifications";
 import { onDiscussionConnection, onDiscussionPost } from "./handlers/discussions";
 import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
 import { onUserPost } from "./handlers/users";
+import { onIdeaPost } from "./handlers/ideas";
 
 // environment
 // --------------------------------------------
@@ -37,6 +38,10 @@ const fetchUserId = getFetchUserIdMiddleware(authClient);
 
 // routes
 // --------------------------------------------
+// ideas
+app.get("/ideas/:id", httpProtection, genericGetDocumentHandler);
+app.get("/ideas", httpProtection, genericGetCollectionHandler);
+app.post("/ideas", httpProtection, fetchUserId, onIdeaPost);
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);
@@ -46,8 +51,8 @@ app.get("/goals", httpProtection, genericGetCollectionHandler);
 // notifications
 app.ws("/notifications", wsProtection, onNotificationConnection);
 // discussions
-app.post("/discussions", httpProtection, fetchUserId, onDiscussionPost);
 app.ws("/discussions", wsProtection, onDiscussionConnection);
+app.post("/discussions", httpProtection, fetchUserId, onDiscussionPost);
 
 
 // start
