@@ -13,8 +13,6 @@ export function onDiscussionPost(req: Request, res: Response) {
     const userIds: string[] = getFromReqBody("userIds", req, true);
     userIds.push(getReqUserId(req));
     const discussion: DbDiscussion = {_id: id, userIds: userIds};
-    // authorize
-    // ...
     // post
     postDocument("discussions", discussion);
     // respond

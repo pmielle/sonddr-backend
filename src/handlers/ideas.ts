@@ -10,8 +10,6 @@ export function onIdeaPost(req: Request, res: Response) {
     const title = getFromReqBody("title", req, true);
     const authorId = getReqUserId(req);
     const idea: DbIdea = {_id: id, title: title, authorId: authorId};
-    // authorize
-    // ...
     // post
     postDocument("ideas", idea);
     // respond

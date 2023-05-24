@@ -8,8 +8,6 @@ export function onUserPost(req: Request, res: Response) {
     const id = getReqUserId(req);
     const name = getFromReqBody("name", req, true);
     const user: DbUser = {_id: id, name: name};
-    // authorize
-    // ...
     // post
     postDocument("users", user);
     // respond

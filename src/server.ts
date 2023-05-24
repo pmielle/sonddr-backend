@@ -10,6 +10,7 @@ import { onDiscussionConnection, onDiscussionPost } from "./handlers/discussions
 import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
 import { onUserPost } from "./handlers/users";
 import { onIdeaPost } from "./handlers/ideas";
+import { onCommentPost } from "./handlers/comments";
 
 // environment
 // --------------------------------------------
@@ -42,6 +43,10 @@ const fetchUserId = getFetchUserIdMiddleware(authClient);
 app.get("/ideas/:id", httpProtection, genericGetDocumentHandler);
 app.get("/ideas", httpProtection, genericGetCollectionHandler);
 app.post("/ideas", httpProtection, fetchUserId, onIdeaPost);
+// comments
+app.get("/comments/:id", httpProtection, genericGetDocumentHandler);
+app.get("/comments", httpProtection, genericGetCollectionHandler);
+app.post("/comments", httpProtection, fetchUserId, onCommentPost);
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);

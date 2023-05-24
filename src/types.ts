@@ -1,3 +1,9 @@
+export interface DbComment {
+    _id: string,
+    content: string,
+    authorId: string,
+}
+
 export interface DbIdea {
     _id: string,
     title: string,
