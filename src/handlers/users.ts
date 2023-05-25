@@ -3,13 +3,14 @@ import { DbUser } from "../types";
 import { getFromReqBody, getReqUserId } from "./generics";
 import { postDocument } from "../database";
 
-export function onUserPost(req: Request, res: Response) {
+export async function onUserPost(req: Request, res: Response) {
     // build 
     const id = getReqUserId(req);
     const name = getFromReqBody("name", req, true);
     const user: DbUser = {_id: id, name: name};
     // post
-    postDocument("users", user);
+    await postDocument("users", user);
     // respond
     res.status(200).send();
+    return;
 }

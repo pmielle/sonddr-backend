@@ -4,6 +4,12 @@ export interface DbComment {
     authorId: string,
 }
 
+export interface DbIdeaVote {
+    _id: string,
+    ideaId: string,
+    fromId: string,
+}
+
 export interface DbIdea {
     _id: string,
     title: string,

@@ -10,7 +10,8 @@ import { onDiscussionConnection, onDiscussionPost } from "./handlers/discussions
 import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
 import { onUserPost } from "./handlers/users";
 import { onIdeaPost } from "./handlers/ideas";
-import { onCommentPost } from "./handlers/comments";
+import { onCommentDelete, onCommentPost } from "./handlers/comments";
+import { onIdeaVoteDelete, onIdeaVotePost } from "./handlers/idea-votes";
 
 // environment
 // --------------------------------------------
@@ -45,8 +46,14 @@ app.get("/ideas", httpProtection, genericGetCollectionHandler);
 app.post("/ideas", httpProtection, fetchUserId, onIdeaPost);
 // comments
 app.get("/comments/:id", httpProtection, genericGetDocumentHandler);
+app.delete("/comments/:id", httpProtection, fetchUserId, onCommentDelete);
 app.get("/comments", httpProtection, genericGetCollectionHandler);
 app.post("/comments", httpProtection, fetchUserId, onCommentPost);
+// idea votes
+app.get("/idea-votes/:id", httpProtection, genericGetDocumentHandler);
+app.delete("/idea-votes/:id", httpProtection, fetchUserId, onIdeaVoteDelete);
+app.get("/idea-votes", httpProtection, genericGetCollectionHandler);
+app.post("/idea-votes", httpProtection, fetchUserId, onIdeaVotePost);
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);

@@ -7,16 +7,17 @@ import { v4 as uuid } from "uuid";
 import { getFromReqBody, getReqUserId } from "./generics";
 import { DbDiscussion } from "../types";
 
-export function onDiscussionPost(req: Request, res: Response) {
+export async function onDiscussionPost(req: Request, res: Response) {
     // build 
     const id = uuid();
     const userIds: string[] = getFromReqBody("userIds", req, true);
     userIds.push(getReqUserId(req));
     const discussion: DbDiscussion = {_id: id, userIds: userIds};
     // post
-    postDocument("discussions", discussion);
+    await postDocument("discussions", discussion);
     // respond
     res.status(200).send();
+    return;
 }
 
 export function onDiscussionConnection(socket: WebSocket, req: http.IncomingMessage) {

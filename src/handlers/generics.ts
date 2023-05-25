@@ -13,6 +13,7 @@ export async function genericGetDocumentHandler(req: Request, res: Response) {
     if (!id) { res.status(400).send("Missing id route parameter"); }
     const data = await getDocument(`${collectionId}/${id}`);
     res.json(data);
+    return;
 }
 
 export async function genericGetCollectionHandler(req: Request, res: Response) {
@@ -20,6 +21,7 @@ export async function genericGetCollectionHandler(req: Request, res: Response) {
     const collectionId = getCollectionIdFromReq(req);
     const data = await getCollection(collectionId);
     res.json(data);
+    return;
 }
 
 export function getFromReqBody(key: string, req: Request, required: boolean = false) {
