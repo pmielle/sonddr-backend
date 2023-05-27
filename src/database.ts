@@ -32,26 +32,32 @@ export async function getCollection<T>(path: string): Promise<T[]> {
     return data;
 }
 
-export function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
-    const options: ChangeStreamOptions = { fullDocument: "updateLookup" };
+export function watchCollection<T>(path: string, pipeline: Document[], options: ChangeStreamOptions): Observable<ChangeStreamDocument<T>> {
     const changeStream = db.collection<T>(path).watch(pipeline, options);
-    const collection$ = from(getCollection<T>(path));  // to avoid promise<observable>
-    return collection$.pipe(switchMap((value) => {
-        return new Observable<T[]>((subscriber) => {
-            subscriber.next(value);
-            changeStream.on("change", (change) => {
-                handleChange(change, value);  // mutates value
-                subscriber.next(value);
-            });
-            changeStream.on("error", (error) => {
-                subscriber.error(error);
-            });
-            changeStream.on("end", () => {
-                subscriber.complete();
-            })
-            return () => changeStream.close()  // called when client unsubscribes
-        });
-    }));
+    return from(changeStream);
+}
+
+export function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
+    const collection$ = from(getCollection<T>(path));
+    return collection$.pipe(
+        switchMap((value) => {
+            // value contains the current collection and will be emitted immediately
+            // then, upon database change, it will be updated (in-place) and emitted
+            return new Observable<T[]>((subscriber) => {
+                subscriber.next(value);  // emit the first value immediately
+                const options: ChangeStreamOptions = { fullDocument: "updateLookup" };
+                const watchSub = watchCollection<T>(path, pipeline, options).subscribe({
+                    next: (change) => {
+                        handleChange(change, value);  // mutates value
+                        subscriber.next(value);
+                    },
+                    error: (error) => subscriber.error(error),
+                    complete: () => subscriber.complete(),
+                });
+                return () => watchSub.unsubscribe()  // called when client unsubscribes
+            });    
+        }) 
+    )
 }
 
 // private
