@@ -5,15 +5,9 @@ import { DbIdeaVote } from "../types";
 import { deleteDocument, getDocument, postDocument } from "../database";
 
 export async function onIdeaVoteDelete(req: Request, res: Response) {
-    // a vote can only be deleted by its author
     const ideaId = getFromReqBody("ideaId", req, true);
     const fromId = getReqUserId(req);
     const id = `${ideaId}-${fromId}`;
-    // make sure the idea exists
-    if (! await getDocument(`ideas/${ideaId}`)) {
-        res.status(400).send(`Idea ${ideaId} not found`);
-        return;
-    }
     // delete
     await deleteDocument(`idea-votes/${id}`);
     // respond
@@ -28,8 +22,8 @@ export async function onIdeaVotePost(req: Request, res: Response) {
     const id = `${ideaId}-${fromId}`;
     const ideaVote: DbIdeaVote = {_id: id, ideaId: ideaId, fromId: fromId};
     // make sure the idea exists
-    if (! await getDocument(`ideas/${ideaId}`)) {
-        res.status(400).send(`Idea ${ideaId} not found`);
+    if (! await getDocument(`ideas/${ideaVote.ideaId}`)) {
+        res.status(400).send(`Idea ${ideaVote.ideaId} not found`);
         return;
     }
     // post

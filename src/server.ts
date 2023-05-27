@@ -12,6 +12,7 @@ import { onUserPost } from "./handlers/users";
 import { onIdeaPost } from "./handlers/ideas";
 import { onCommentDelete, onCommentPost } from "./handlers/comments";
 import { onIdeaVoteDelete, onIdeaVotePost } from "./handlers/idea-votes";
+import { onCommentVoteDelete, onCommentVotePost } from "./handlers/comment-votes";
 
 // environment
 // --------------------------------------------
@@ -54,6 +55,11 @@ app.get("/idea-votes/:id", httpProtection, genericGetDocumentHandler);
 app.delete("/idea-votes/:id", httpProtection, fetchUserId, onIdeaVoteDelete);
 app.get("/idea-votes", httpProtection, genericGetCollectionHandler);
 app.post("/idea-votes", httpProtection, fetchUserId, onIdeaVotePost);
+// comment votes
+app.get("/comment-votes/:id", httpProtection, genericGetDocumentHandler);
+app.delete("/comment-votes/:id", httpProtection, fetchUserId, onCommentVoteDelete);
+app.get("/comment-votes", httpProtection, genericGetCollectionHandler);
+app.post("/comment-votes", httpProtection, fetchUserId, onCommentVotePost);
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);

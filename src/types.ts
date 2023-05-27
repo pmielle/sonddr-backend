@@ -10,6 +10,13 @@ export interface DbIdeaVote {
     fromId: string,
 }
 
+export interface DbCommentVote {
+    _id: string,
+    commentId: string,
+    fromId: string,
+    value: -1|1,
+}
+
 export interface DbIdea {
     _id: string,
     title: string,
