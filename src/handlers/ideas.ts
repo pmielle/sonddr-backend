@@ -9,7 +9,7 @@ export async function onIdeaPost(req: Request, res: Response) {
     const id = uuid();
     const title = getFromReqBody("title", req, true);
     const authorId = getReqUserId(req);
-    const idea: DbIdea = {_id: id, title: title, authorId: authorId};
+    const idea: DbIdea = {_id: id, title: title, authorId: authorId, votes: 0};
     // post
     await postDocument("ideas", idea);
     // respond

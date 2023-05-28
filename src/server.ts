@@ -13,6 +13,9 @@ import { onIdeaPost } from "./handlers/ideas";
 import { onCommentDelete, onCommentPost } from "./handlers/comments";
 import { onIdeaVoteDelete, onIdeaVotePost } from "./handlers/idea-votes";
 import { onCommentVoteDelete, onCommentVotePost } from "./handlers/comment-votes";
+import { watchCollection } from "./database";
+import { onIdeaVoteChange } from "./triggers/idea-votes";
+import { DbIdeaVote } from "./types";
 
 // environment
 // --------------------------------------------
@@ -38,6 +41,12 @@ app.use(getAuthMiddleware(authClient));
 const httpProtection = getAuthProtection(authClient);
 const wsProtection = getWsProtection(authClient);
 const fetchUserId = getFetchUserIdMiddleware(authClient);
+
+
+// triggers
+// --------------------------------------------
+watchCollection<DbIdeaVote>("idea-votes").subscribe(onIdeaVoteChange);
+
 
 // routes
 // --------------------------------------------

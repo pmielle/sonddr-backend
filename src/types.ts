@@ -21,6 +21,7 @@ export interface DbIdea {
     _id: string,
     title: string,
     authorId: string,
+    votes: number,
 }
 
 export interface DbGoal {
