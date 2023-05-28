@@ -12,10 +12,11 @@ import { onUserPost } from "./handlers/users";
 import { onIdeaPost } from "./handlers/ideas";
 import { onCommentDelete, onCommentPost } from "./handlers/comments";
 import { onIdeaVoteDelete, onIdeaVotePost } from "./handlers/idea-votes";
-import { onCommentVoteDelete, onCommentVotePost } from "./handlers/comment-votes";
+import { onCommentVoteDelete, onCommentVotePost, onCommentVotePut } from "./handlers/comment-votes";
 import { watchCollection } from "./database";
 import { onIdeaVoteChange } from "./triggers/idea-votes";
-import { DbIdeaVote } from "./types";
+import { DbCommentVote, DbIdeaVote } from "./types";
+import { onCommentVoteChange } from "./triggers/comment-votes";
 
 // environment
 // --------------------------------------------
@@ -46,6 +47,7 @@ const fetchUserId = getFetchUserIdMiddleware(authClient);
 // triggers
 // --------------------------------------------
 watchCollection<DbIdeaVote>("idea-votes").subscribe(onIdeaVoteChange);
+watchCollection<DbCommentVote>("comment-votes").subscribe(onCommentVoteChange);
 
 
 // routes
@@ -69,6 +71,7 @@ app.get("/comment-votes/:id", httpProtection, genericGetDocumentHandler);
 app.delete("/comment-votes/:id", httpProtection, fetchUserId, onCommentVoteDelete);
 app.get("/comment-votes", httpProtection, genericGetCollectionHandler);
 app.post("/comment-votes", httpProtection, fetchUserId, onCommentVotePost);
+app.put("/comment-votes", httpProtection, fetchUserId, onCommentVotePut);
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);

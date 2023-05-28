@@ -2,6 +2,7 @@ export interface DbComment {
     _id: string,
     content: string,
     authorId: string,
+    votes: number,
 }
 
 export interface DbIdeaVote {
