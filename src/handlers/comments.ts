@@ -26,7 +26,7 @@ export async function onCommentPost(req: Request, res: Response) {
     const content = getFromReqBody("content", req, true);
     const ideaId = getFromReqBody("ideaId", req, true);
     const authorId = getReqUserId(req);
-    const comment: DbComment = {_id: id, content: content, authorId: authorId};
+    const comment: DbComment = {_id: id, content: content, authorId: authorId, votes: 0};
     // make sure the idea exists
     if (! getDocument(`ideas/${ideaId}`)) {
         res.status(400).send(`Idea ${ideaId} not found`);
