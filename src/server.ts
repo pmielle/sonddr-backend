@@ -17,6 +17,7 @@ import { watchCollection } from "./database";
 import { onIdeaVoteChange } from "./triggers/idea-votes";
 import { DbCommentVote, DbIdeaVote } from "./types";
 import { onCommentVoteChange } from "./triggers/comment-votes";
+import { onMessageConnection, onMessagePost } from "./handlers/messages";
 
 // environment
 // --------------------------------------------
@@ -83,6 +84,9 @@ app.ws("/notifications", wsProtection, onNotificationConnection);
 // discussions
 app.ws("/discussions", wsProtection, onDiscussionConnection);
 app.post("/discussions", httpProtection, fetchUserId, onDiscussionPost);
+// messages
+app.ws("/messages", wsProtection, onMessageConnection);
+app.post("/messages", httpProtection, fetchUserId, onMessagePost);
 
 
 // start

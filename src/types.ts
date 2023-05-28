@@ -1,3 +1,10 @@
+export interface DbMessage {
+    _id: string,
+    discussionId: string,
+    fromUser: string,
+    content: string,
+}
+
 export interface DbComment {
     _id: string,
     content: string,
