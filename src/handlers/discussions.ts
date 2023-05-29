@@ -12,7 +12,7 @@ export async function onDiscussionPost(req: Request, res: Response) {
     const id = uuid();
     const userIds: string[] = getFromReqBody("userIds", req, true);
     userIds.push(getReqUserId(req));
-    const discussion: DbDiscussion = {_id: id, userIds: userIds};
+    const discussion: DbDiscussion = {_id: id, userIds: userIds, latestMessageId: undefined};
     // post
     await postDocument("discussions", discussion);
     // respond

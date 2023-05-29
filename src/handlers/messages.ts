@@ -13,7 +13,7 @@ export async function onMessagePost(req: Request, res: Response) {
     const fromUser = getReqUserId(req);
     const discussionId = getFromReqBody("discussionId", req, true);
     const content = getFromReqBody("content", req, true);
-    const message: DbMessage = {_id: id, discussionId: discussionId, fromUser: fromUser, content: content};
+    const message: DbMessage = {_id: id, discussionId: discussionId, fromUser: fromUser, content: content, timestamp: new Date()};
     // check that this user is in the discussion
     const discussion = await getDocument<DbDiscussion>(`discussions/${message.discussionId}`);
     if (! discussion.userIds.includes(message.fromUser)) {

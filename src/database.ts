@@ -1,4 +1,4 @@
-import { ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamInsertDocument, ChangeStreamOptions, ChangeStreamUpdateDocument, Document, MongoClient, ObjectId, UpdateFilter } from "mongodb";
+import { ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamInsertDocument, ChangeStreamOptions, ChangeStreamUpdateDocument, Document, Filter, FindOptions, MongoClient, ObjectId, UpdateFilter } from "mongodb";
 import dotenv from "dotenv";
 import { Observable, from, switchMap } from "rxjs";
 
@@ -33,8 +33,13 @@ export async function getDocument<T>(path: string): Promise<T> {
     return data;
 }
 
-export async function getCollection<T>(path: string): Promise<T[]> {
-    const data: T[] = await db.collection(path).find<T>({}).toArray();
+export async function findDocument<T>(path: string, filter: Filter<T>): Promise<T> {
+    const data: T = await db.collection(path).findOne<T>(filter);
+    return data;
+}
+
+export async function getCollection<T>(path: string, filter: Filter<T> = {}, options: FindOptions = {}): Promise<T[]> {
+    const data: T[] = await db.collection(path).find<T>(filter, options).toArray();
     return data;
 }
 

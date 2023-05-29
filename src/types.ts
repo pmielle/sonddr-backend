@@ -3,6 +3,7 @@ export interface DbMessage {
     discussionId: string,
     fromUser: string,
     content: string,
+    timestamp: Date,
 }
 
 export interface DbComment {
@@ -45,6 +46,7 @@ export interface DbNotification {
 export interface DbDiscussion {
     _id: string,
     userIds: string[],
+    latestMessageId?: string,
 }
 
 export interface DbUser {
