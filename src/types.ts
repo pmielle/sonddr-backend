@@ -40,6 +40,7 @@ export interface DbGoal {
 
 export interface DbNotification {
     _id: string,
+    userId: string,
     content: string,
 }
 
