@@ -11,13 +11,13 @@ const db = client.db();
 
 export async function updateDocument<T>(path: string, payload: UpdateFilter<T> | Partial<T>) {
     const [collectionId, documentId] = parseDocumentPath(path);
-    await db.collection(collectionId).updateOne({_id: new ObjectId(documentId)}, payload);
+    await db.collection(collectionId).updateOne({ _id: new ObjectId(documentId) }, payload);
     return;
 }
 
 export async function deleteDocument(path: string) {
     const [collectionId, documentId] = parseDocumentPath(path);
-    await db.collection(collectionId).deleteOne({_id: new ObjectId(documentId)});
+    await db.collection(collectionId).deleteOne({ _id: new ObjectId(documentId) });
     return;
 }
 
@@ -29,7 +29,7 @@ export async function postDocument(path: string, payload: any) {
 
 export async function getDocument<T>(path: string): Promise<T> {
     const [collectionId, documentId] = parseDocumentPath(path);
-    const data: T = await db.collection(collectionId).findOne<T>({"_id": new ObjectId(documentId)});
+    const data: T = await db.collection(collectionId).findOne<T>({ "_id": new ObjectId(documentId) });
     return data;
 }
 
@@ -43,13 +43,22 @@ export async function getCollection<T>(path: string, filter: Filter<T> = {}, opt
     return data;
 }
 
-export function watchCollection<T>(path: string, pipeline: Document[] = [], options: ChangeStreamOptions = { fullDocument: "updateLookup", fullDocumentBeforeChange: "required" }): Observable<ChangeStreamDocument<T>> {
-    const changeStream = db.collection<T>(path).watch(pipeline, options);
-    return from(changeStream);
+export async function getCollectionAggregate<T>(path: string, pipeline: Document[] = []): Promise<T[]> {
+    const data: T[] = await db.collection(path).aggregate<T>(pipeline).toArray();
+    return data;
+}
+
+
+
+export function watchCollection<T>(path: string, pipeline: Document[] = [], options: ChangeStreamOptions = { fullDocument: "updateLookup", fullDocumentBeforeChange: "whenAvailable" }): Observable<ChangeStreamDocument<T>> {
+    return new Observable((subscriber) => {
+        const watchSub = db.collection<T>(path).watch(pipeline, options).on('change', change => subscriber.next(change));
+        return () => watchSub.close();
+    });
 }
 
 export function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
-    const collection$ = from(getCollection<T>(path));
+    const collection$ = from(getCollectionAggregate<T>(path, pipeline));
     return collection$.pipe(
         switchMap((value) => {
             // value contains the current collection and will be emitted immediately
@@ -65,8 +74,8 @@ export function streamCollection<T>(path: string, pipeline: Document[] = []): Ob
                     complete: () => subscriber.complete(),
                 });
                 return () => watchSub.unsubscribe()  // called when client unsubscribes
-            });    
-        }) 
+            });
+        })
     )
 }
 
@@ -102,12 +111,12 @@ function handleInsertChange<T>(change: ChangeStreamInsertDocument<T>, value: T[]
 
 function handleDeleteChange<T>(change: ChangeStreamDeleteDocument<T>, value: T[]) {
     const idToRemove = change.documentKey._id;
-    const index = value.findIndex((doc => doc["_id"] === idToRemove));
+    const index = value.findIndex((doc => idToRemove.equals(doc["_id"])));
     value.splice(index, 1);
 }
 
 function handleUpdateChange<T>(change: ChangeStreamUpdateDocument<T>, value: T[]) {
     const idToReplace = change.documentKey._id;
-    const index = value.findIndex((doc) => doc["_id"] === idToReplace);
+    const index = value.findIndex((doc) => idToReplace.equals(doc["_id"]));
     value[index] = change.fullDocument;
 }

@@ -17,7 +17,6 @@ export async function genericGetDocumentHandler(req: Request, res: Response) {
 }
 
 export async function genericGetCollectionHandler(req: Request, res: Response) {
-    console.log((req as any).kcUser);
     const collectionId = getCollectionIdFromReq(req);
     const data = await getCollection(collectionId);
     res.json(data);
