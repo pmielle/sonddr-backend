@@ -11,5 +11,5 @@ export function onNotificationConnection(socket: WebSocket, req: http.IncomingMe
     if (!userId) {
         socket.close(1001, `${idKey} not found in query params`);
     }
-    streamToWebsocket(streamCollection<DbNotification>("notifications", [{$match: {userId: userId}}]), socket);
+    streamToWebsocket(streamCollection<DbNotification>("notifications", {userId: userId}), socket);
 }

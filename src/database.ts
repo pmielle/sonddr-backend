@@ -43,13 +43,6 @@ export async function getCollection<T>(path: string, filter: Filter<T> = {}, opt
     return data;
 }
 
-export async function getCollectionAggregate<T>(path: string, pipeline: Document[] = []): Promise<T[]> {
-    const data: T[] = await db.collection(path).aggregate<T>(pipeline).toArray();
-    return data;
-}
-
-
-
 export function watchCollection<T>(path: string, pipeline: Document[] = [], options: ChangeStreamOptions = { fullDocument: "updateLookup", fullDocumentBeforeChange: "whenAvailable" }): Observable<ChangeStreamDocument<T>> {
     return new Observable((subscriber) => {
         const watchSub = db.collection<T>(path).watch(pipeline, options).on('change', change => subscriber.next(change));
@@ -57,15 +50,16 @@ export function watchCollection<T>(path: string, pipeline: Document[] = [], opti
     });
 }
 
-export function streamCollection<T>(path: string, pipeline: Document[] = []): Observable<T[]> {
-    const collection$ = from(getCollectionAggregate<T>(path, pipeline));
+export function streamCollection<T>(path: string, filter: Filter<T> = {}): Observable<T[]> {
+    const watchPipeline = filterToWatchPipeline(filter);
+    const collection$ = from(getCollection<T>(path, filter));
     return collection$.pipe(
         switchMap((value) => {
             // value contains the current collection and will be emitted immediately
             // then, upon database change, it will be updated (in-place) and emitted
             return new Observable<T[]>((subscriber) => {
                 subscriber.next(value);  // emit the first value immediately
-                const watchSub = watchCollection<T>(path, pipeline).subscribe({
+                const watchSub = watchCollection<T>(path, watchPipeline).subscribe({
                     next: (change) => {
                         handleChange(change, value);  // mutates value
                         subscriber.next(value);
@@ -81,6 +75,17 @@ export function streamCollection<T>(path: string, pipeline: Document[] = []): Ob
 
 // private
 // --------------------------------------------
+function filterToWatchPipeline<T>(filter: Filter<T>): Document[] {
+    const fullDocumentMatch = {};
+    const fullDocumentBeforeChangeMatch = {};
+    for (const [key, value] of Object.entries(filter)) {
+        fullDocumentMatch[`fullDocument.${key}`] = value;
+        fullDocumentBeforeChangeMatch[`fullDocumentBeforeChange.${key}`] = value;
+    }
+    return [ { $match: { $or: [ fullDocumentMatch, fullDocumentBeforeChangeMatch] } } ];    
+
+}
+
 function parseDocumentPath(path: string): [string, string] {
     const pathFragments = path.split("/");
     if (pathFragments.length != 2) { throw new Error(`Document path ${path} does not have 2 fragments`); }
@@ -112,6 +117,7 @@ function handleInsertChange<T>(change: ChangeStreamInsertDocument<T>, value: T[]
 function handleDeleteChange<T>(change: ChangeStreamDeleteDocument<T>, value: T[]) {
     const idToRemove = change.documentKey._id;
     const index = value.findIndex((doc => idToRemove.equals(doc["_id"])));
+    if (index < 0) { return; }
     value.splice(index, 1);
 }
 

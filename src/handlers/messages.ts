@@ -33,5 +33,5 @@ export function onMessageConnection(socket: WebSocket, req: http.IncomingMessage
     if (!discussionId) {
         socket.close(1001, `${idKey} not found in query params`);
     }
-    streamToWebsocket(streamCollection("messages"), socket);
+    streamToWebsocket(streamCollection<DbMessage>("messages"), socket);
 }

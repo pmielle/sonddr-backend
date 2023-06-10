@@ -27,5 +27,5 @@ export function onDiscussionConnection(socket: WebSocket, req: http.IncomingMess
     if (!userId) {
         socket.close(1001, `${idKey} not found in query params`);
     }
-    streamToWebsocket(streamCollection<DbDiscussion>("discussions", [{$match: {userIds: userId}}]), socket);
+    streamToWebsocket(streamCollection<DbDiscussion>("discussions", {userIds: userId}), socket);
 }
