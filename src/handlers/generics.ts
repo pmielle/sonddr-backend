@@ -16,6 +16,19 @@ export async function genericGetDocumentHandler(req: Request, res: Response) {
     return;
 }
 
+export async function genericHeadDocumentHandler(req: Request, res: Response) {
+    const collectionId = getCollectionIdFromReq(req);
+    const id = req.params["id"];
+    if (!id) { res.status(400).send("Missing id route parameter"); }
+    const data = await getDocument(`${collectionId}/${id}`);
+    if (data === null) {
+        res.status(200).send();
+    } else {
+        res.status(404).send();
+    }
+    return;
+}
+
 export async function genericGetCollectionHandler(req: Request, res: Response) {
     const collectionId = getCollectionIdFromReq(req);
     const data = await getCollection(collectionId);

@@ -7,7 +7,7 @@ import { makeSession } from "./session";
 import { getAuthClient, getAuthMiddleware, getAuthProtection, getFetchUserIdMiddleware, getWsProtection } from "./authentication";
 import { onNotificationConnection } from "./handlers/notifications";
 import { onDiscussionConnection, onDiscussionPost } from "./handlers/discussions";
-import { genericGetDocumentHandler, genericGetCollectionHandler } from "./handlers/generics";
+import { genericGetDocumentHandler, genericGetCollectionHandler, genericHeadDocumentHandler } from "./handlers/generics";
 import { onUserPost } from "./handlers/users";
 import { onIdeaPost } from "./handlers/ideas";
 import { onCommentDelete, onCommentPost } from "./handlers/comments";
@@ -64,17 +64,20 @@ app.get("/comments", httpProtection, genericGetCollectionHandler);
 app.post("/comments", httpProtection, fetchUserId, onCommentPost);
 // idea votes
 app.get("/idea-votes/:id", httpProtection, genericGetDocumentHandler);
+app.head("/idea-votes/:id", httpProtection, genericHeadDocumentHandler);
 app.delete("/idea-votes/:id", httpProtection, fetchUserId, onIdeaVoteDelete);
 app.get("/idea-votes", httpProtection, genericGetCollectionHandler);
 app.post("/idea-votes", httpProtection, fetchUserId, onIdeaVotePost);
 // comment votes
 app.get("/comment-votes/:id", httpProtection, genericGetDocumentHandler);
+app.head("/comment-votes/:id", httpProtection, genericHeadDocumentHandler);
 app.delete("/comment-votes/:id", httpProtection, fetchUserId, onCommentVoteDelete);
 app.get("/comment-votes", httpProtection, genericGetCollectionHandler);
 app.post("/comment-votes", httpProtection, fetchUserId, onCommentVotePost);
 app.put("/comment-votes", httpProtection, fetchUserId, onCommentVotePut);
 // users
 app.get("/users/:id", httpProtection, genericGetDocumentHandler);
+app.head("/users/:id", httpProtection, genericHeadDocumentHandler);
 app.get("/users", httpProtection, genericGetCollectionHandler);
 app.post("/users", httpProtection, fetchUserId, onUserPost);
 // goals
